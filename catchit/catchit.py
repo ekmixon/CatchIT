@@ -26,7 +26,7 @@ FILE_REGEXS = str(BASE_PATH / "regexs.json")
 EXEC_GREP_SCRIPT = str(BASE_PATH / "grep_tunnel.sh")
 EXEC_FIND_SCRIPT = str(BASE_PATH / "find_tunnel.sh")
 INVERSE_GREP = str(BASE_PATH / "inverse_grep.txt")
-BASE64_CHARS = "+/=" + ascii_letters + digits
+BASE64_CHARS = f"+/={ascii_letters}{digits}"
 
 catchit_output = CatchIT_Ouput()
 catchit_config = Catchit_Config()
@@ -63,19 +63,19 @@ def getFinding_GREP(
             if len(out_line) < 2:
                 break
             if os.name == "nt" and ntpath.isabs(line) and line[1] == 58:
-                finding["path"] = out_line[0] + ":" + out_line[1]
+                finding["path"] = f"{out_line[0]}:{out_line[1]}"
                 finding["path"] = str(
                     Path(finding["path"]).relative_to(Path(scanning_path))
                 )
                 finding["line"] = out_line[2]
-                finding["match"] = str(":".join(out_line[3:]))
+                finding["match"] = ":".join(out_line[3:])
             else:
                 finding["path"] = out_line[0]
                 finding["path"] = str(
                     Path(finding["path"]).relative_to(Path(scanning_path))
                 )
                 finding["line"] = out_line[1]
-                finding["match"] = str(":".join(out_line[2:]))
+                finding["match"] = ":".join(out_line[2:])
             catchit_output.summary["findings"]["code"] += 1
             if (
                 confidence >= 0.5
@@ -108,15 +108,12 @@ def getFinding_FIND(
             if len(out_line[0]) == 0:
                 break
             if len(out_line) == 2:
-                finding["path"] = out_line[0] + ":" + out_line[1]
-                finding["path"] = str(
-                    Path(finding["path"]).relative_to(Path(scanning_path))
-                )
+                finding["path"] = f"{out_line[0]}:{out_line[1]}"
             else:
                 finding["path"] = out_line[0]
-                finding["path"] = str(
-                    Path(finding["path"]).relative_to(Path(scanning_path))
-                )
+            finding["path"] = str(
+                Path(finding["path"]).relative_to(Path(scanning_path))
+            )
             catchit_output.summary["findings"]["file"] += 1
             if confidence >= 0.5:
                 catchit_output.summary["findings"]["blocking_file"] += 1
